@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;test/src/XADC_zc7000.h&apos; to &apos;XADC.h&apos;" description="Rename resource &apos;XADC_zc7000.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/XADC_zc7000.h" name="XADC.h" stamp="1684760490813" updateReferences="true"/>
+</session>

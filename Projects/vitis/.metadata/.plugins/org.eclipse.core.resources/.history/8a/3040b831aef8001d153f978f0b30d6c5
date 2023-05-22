@@ -1,0 +1,62 @@
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "timers.h"
+
+#include "xil_printf.h"
+#include "xparameters.h"
+
+#include "AD5065.h"
+#include "XADC.h"
+
+#define TIMER_ID	1
+#define DELAY_10_SECONDS	10000UL
+#define DELAY_1_SECOND		1000UL
+#define TIMER_CHECK_THRESHOLD	9
+
+static void readVoltageTask(void *pvParameters);
+static void printVoltageTask(void *pvParameters);
+static void setupVoltageTask(void *pvParameters);
+
+static TaskHandle_t xReadVoltageTask;
+static TaskHandle_t xPrintVoltageTask;
+static TaskHandle_t xSetupVoltageTask;
+
+u16 currentVoltage;
+
+int main( void )
+{
+	xil_printf("Init sucsess!\r\n");
+
+	xTaskCreate(readVoltageTask,
+				(const char *) "readVoltageTask",
+				configMINIMAL_STACK_SIZE,
+				NULL,
+				tskIDLE_PRIORITY,
+				&xReadVoltageTask );
+
+
+	vTaskStartScheduler();
+	for( ;; );
+}
+
+static void readVoltageTask( void *pvParameters ) {
+	const TickType_t x1second = pdMS_TO_TICKS( DELAY_1_SECOND );
+
+	for( ;; ) {
+		vTaskDelay( x1second );
+
+		xQueueSend(xQueue, HWstring, 0UL);
+	}
+}
+
+static void prvRxTask(void *pvParameters) {
+	char Recdstring[15] = "";
+
+	for( ;; ) {
+		xQueueReceive(xQueue, Recdstring, portMAX_DELAY);
+		xil_printf("Rx task received string from Tx task: %s\r\n", Recdstring);
+		RxtaskCntr++;
+	}
+}
+

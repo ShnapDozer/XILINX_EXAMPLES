@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="DAC_ADC_testApp" location="C:/Users/Work/Downloads/Xilinx/Projects/vitis/DAC_ADC_testApp" platform="C:/Users/Work/Downloads/Xilinx/Projects/vitis/DAC_ADC_platform/export/DAC_ADC_platform/DAC_ADC_platform.xpfm" platformUID="xilinx:zc702::0.0(custom)" systemProject="DAC_ADC_testApp_system" sysConfig="DAC_ADC_platform" runtime="C/C++" cpu="standalone_domain" cpuInstance="ps7_cortexa9_0" os="standalone" mssSignature="901c55e14e0aeb84f42926493c600a49">
+  <configuration name="Debug" id="xilinx.gnu.armv7.exe.debug.1754141166">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+    <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <configuration name="Release" id="xilinx.gnu.armv7.exe.release.971174976" dirty="true">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <template appTemplateName="hello_world"/>
+</sdkproject:SdkProject>

@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "platform.h"
+#include "xil_printf.h"
+#include "xil_io.h"
+#include "xparameters.h"
+#include "xuartps.h"
+
+
+int main()
+{
+    init_platform();
+
+    print("Hello World\n\r");
+    print("Successfully ran Hello World application");
+    cleanup_platform();
+    return 0;
+}

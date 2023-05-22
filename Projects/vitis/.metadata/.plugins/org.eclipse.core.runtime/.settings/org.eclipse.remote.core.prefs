@@ -1,0 +1,6 @@
+connections/org.eclipse.remote.serial.core.connectionType/XilinxUart/serial.baudRate=11
+connections/org.eclipse.remote.serial.core.connectionType/XilinxUart/serial.byteSize=3
+connections/org.eclipse.remote.serial.core.connectionType/XilinxUart/serial.parity=0
+connections/org.eclipse.remote.serial.core.connectionType/XilinxUart/serial.portName=COM10
+connections/org.eclipse.remote.serial.core.connectionType/XilinxUart/serial.stopBits=0
+eclipse.preferences.version=1

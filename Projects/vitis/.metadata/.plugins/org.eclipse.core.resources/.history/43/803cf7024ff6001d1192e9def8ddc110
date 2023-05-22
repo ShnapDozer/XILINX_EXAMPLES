@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "platform.h"
+
+#include "xil_printf.h"
+#include "xil_io.h"
+
+#include "xparameters.h"
+#include "xuartps.h"
+
+#define length 32
+char input(char *buff);
+
+#define VPVN_ADDR XPAR_XADC_WIZ_0_BASEADDR + 0x20C
+#define VAUX0_ADDR XPAR_XADC_WIZ_0_BASEADDR + 0x240
+#define VAUX8_ADDR XPAR_XADC_WIZ_0_BASEADDR + 0x260
+
+
+int main()
+{
+	char buff[length];
+	float in = 1.8;
+	float ratio = 0;
+	float Vmax = 2.5;
+	int val = 65535;
+
+	init_platform();
+
+	print("Set DAC voltage level:\n");
+	input(buff);
+
+	in = atof(buff);
+	if (in > 2.5 || in < 0) {
+		printf("Incorrect input value: %f\n", in);
+		print("The value must be between 0 and 2.5\n");
+		goto retry;
+	} else	{
+		printf("The DAC voltage is ~ %f\n", in);
+	}
+
+	ratio = in/Vmax;
+	val = (int)(65535*ratio);
+
+	//66060288 = 001111110000000000000000 write and update both DACs
+	// Multiply the value by 16 in order to compensate for the 4 LSB zeros
+	Xil_Out32(XPAR_AD5065_DUAL_DAC_AXI_0_BASEADDR, 66060288 + 16*val);
+
+	u16 data0 = 0;
+	u16 data8 = 0;
+	while(1) {
+		data0 = Xil_In32(VAUX0_ADDR);
+		data8 = Xil_In32(VAUX8_ADDR);
+		printf("Incorrect input value: %f\n", in);
+
+
+	}
+
+	cleanup_platform();
+	return 0;
+}
+
+char input(char *buff) {
+	memset(buff, 0x00, length);
+	int i = 0;
+	char in;
+
+	while (1) {
+		in = XUartPs_RecvByte(XPAR_PS7_UART_1_BASEADDR); // reading from terminal
+
+		if (in == 13) {
+			break;
+		} else {
+
+			if (i < length) {
+				buff[i] = in;
+				i++;
+			} else if (i == length) {
+				xil_printf("\n The buffer is overflowing!!!\n");
+			}
+		}
+	}
+	return 0;
+}

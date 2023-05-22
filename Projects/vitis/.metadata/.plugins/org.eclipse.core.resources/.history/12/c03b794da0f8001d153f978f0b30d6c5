@@ -1,0 +1,9 @@
+
+#define VPVN_ADDR 	(XPAR_XADC_WIZ_0_BASEADDR + 0x20C)
+#define VAUX0_ADDR 	(XPAR_XADC_WIZ_0_BASEADDR + 0x240)
+#define VAUX8_ADDR 	(XPAR_XADC_WIZ_0_BASEADDR + 0x260)
+
+#define CONVERION_COEF 0.015
+
+void getDataFrom();
+void getDataFromMainChannel();

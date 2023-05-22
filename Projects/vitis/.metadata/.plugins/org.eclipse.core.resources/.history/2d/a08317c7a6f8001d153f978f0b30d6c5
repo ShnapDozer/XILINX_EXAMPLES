@@ -1,0 +1,10 @@
+
+
+void setBothDacVoltage(float voltage, float voltageRef) {
+	float ratio = in / voltageRef;
+	int val = (int)(65535*ratio);
+
+	// Multiply the value by 16 in order to compensate for the 4 LSB zeros
+	Xil_Out32(XPAR_AD5065_DUAL_DAC_AXI_0_BASEADDR, UPDATE_BOTH_DAC_COMMAND + 16*val);
+}
+
