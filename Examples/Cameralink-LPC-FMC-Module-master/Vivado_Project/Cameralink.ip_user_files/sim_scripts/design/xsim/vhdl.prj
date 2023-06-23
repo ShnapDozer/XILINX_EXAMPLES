@@ -1,0 +1,12 @@
+vhdl xil_defaultlib  \
+"../../../bd/design/ip/design_proc_sys_reset_0/sim/design_proc_sys_reset_0.vhd" \
+"../../../bd/design/ip/design_axi_dma_2_1/sim/design_axi_dma_2_1.vhd" \
+"../../../../Cameralink.srcs/sources_1/ipshared/654a/hdl/FreqCalc.vhd" \
+"../../../../Cameralink.srcs/sources_1/ipshared/654a/hdl/CLReceive_S00_AXI.vhd" \
+"../../../../Cameralink.srcs/sources_1/ipshared/654a/hdl/CLReceive_M00_AXIS.vhd" \
+"../../../../Cameralink.srcs/sources_1/ipshared/654a/hdl/CLReceive.vhd" \
+"../../../bd/design/ip/design_CLReceive_0_0/sim/design_CLReceive_0_0.vhd" \
+"../../../bd/design/ip/design_proc_sys_reset_1/sim/design_proc_sys_reset_1.vhd" \
+"../../../bd/design/sim/design.vhd" \
+
+nosort

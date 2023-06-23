@@ -1,4 +1,4 @@
-// (c) Copyright 1995-2015 Xilinx, Inc. All rights reserved.
+// (c) Copyright 1995-2023 Xilinx, Inc. All rights reserved.
 // 
 // This file contains confidential and proprietary information
 // of Xilinx, Inc. and is protected under U.S. and
@@ -47,16 +47,16 @@
 // DO NOT MODIFY THIS FILE.
 
 
-// IP VLNV: xilinx.com:ip:axis_data_fifo:1.1
-// IP Revision: 5
+// IP VLNV: xilinx.com:ip:axis_data_fifo:2.0
+// IP Revision: 3
 
-(* X_CORE_INFO = "axis_data_fifo_v1_1_axis_data_fifo,Vivado 2014.4" *)
-(* CHECK_LICENSE_TYPE = "design_axis_data_fifo_1_1,axis_data_fifo_v1_1_axis_data_fifo,{}" *)
-(* CORE_GENERATION_INFO = "design_axis_data_fifo_1_1,axis_data_fifo_v1_1_axis_data_fifo,{x_ipProduct=Vivado 2014.4,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axis_data_fifo,x_ipVersion=1.1,x_ipCoreRevision=5,x_ipLanguage=VHDL,x_ipSimLanguage=MIXED,C_FAMILY=zynq,C_AXIS_TDATA_WIDTH=32,C_AXIS_TID_WIDTH=1,C_AXIS_TDEST_WIDTH=1,C_AXIS_TUSER_WIDTH=1,C_AXIS_SIGNAL_SET=0b00000000000000000000000000011011,C_FIFO_DEPTH=16,C_FIFO_MODE=1,C_IS_ACLK_ASYNC=1,C_SYNCHRONIZER_STAGE=2,C_ACLKEN_CONV_MODE=0}" *)
+(* X_CORE_INFO = "axis_data_fifo_v2_0_3_top,Vivado 2020.1" *)
+(* CHECK_LICENSE_TYPE = "design_axis_data_fifo_1_1,axis_data_fifo_v2_0_3_top,{}" *)
+(* CORE_GENERATION_INFO = "design_axis_data_fifo_1_1,axis_data_fifo_v2_0_3_top,{x_ipProduct=Vivado 2020.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axis_data_fifo,x_ipVersion=2.0,x_ipCoreRevision=3,x_ipLanguage=VHDL,x_ipSimLanguage=MIXED,C_FAMILY=zynq,C_AXIS_TDATA_WIDTH=32,C_AXIS_TID_WIDTH=1,C_AXIS_TDEST_WIDTH=1,C_AXIS_TUSER_WIDTH=1,C_AXIS_SIGNAL_SET=0b00000000000000000000000000011011,C_FIFO_DEPTH=16,C_FIFO_MODE=1,C_IS_ACLK_ASYNC=1,C_SYNCHRONIZER_STAGE=2,C_ACLKEN_CONV_MODE=0,C_ECC_MODE=0,C_FIFO_MEMORY_TYPE=auto,C_USE_\
+ADV_FEATURES=825503796,C_PROG_EMPTY_THRESH=5,C_PROG_FULL_THRESH=11}" *)
 (* DowngradeIPIdentifiedWarnings = "yes" *)
 module design_axis_data_fifo_1_1 (
   s_axis_aresetn,
-  m_axis_aresetn,
   s_axis_aclk,
   s_axis_tvalid,
   s_axis_tready,
@@ -69,15 +69,14 @@ module design_axis_data_fifo_1_1 (
   m_axis_tdata,
   m_axis_tkeep,
   m_axis_tlast,
-  axis_data_count,
   axis_wr_data_count,
   axis_rd_data_count
 );
 
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME S_RSTIF, POLARITY ACTIVE_LOW, INSERT_VIP 0, TYPE INTERCONNECT" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 S_RSTIF RST" *)
 input wire s_axis_aresetn;
-(* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 M_RSTIF RST" *)
-input wire m_axis_aresetn;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME S_CLKIF, ASSOCIATED_BUSIF S_AXIS, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.000, CLK_DOMAIN design_O2_CLK, ASSOCIATED_RESET s_axis_aresetn, INSERT_VIP 0, ASSOCIATED_CLKEN s_axis_aclken" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 S_CLKIF CLK" *)
 input wire s_axis_aclk;
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TVALID" *)
@@ -88,8 +87,10 @@ output wire s_axis_tready;
 input wire [31 : 0] s_axis_tdata;
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TKEEP" *)
 input wire [3 : 0] s_axis_tkeep;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME S_AXIS, TDATA_NUM_BYTES 4, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 1, HAS_TLAST 1, FREQ_HZ 100000000, PHASE 0.000, CLK_DOMAIN design_O2_CLK, LAYERED_METADATA undef, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TLAST" *)
 input wire s_axis_tlast;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME M_CLKIF, ASSOCIATED_BUSIF M_AXIS, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.000, CLK_DOMAIN design_processing_system7_1_0_FCLK_CLK0, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 M_CLKIF CLK" *)
 input wire m_axis_aclk;
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 M_AXIS TVALID" *)
@@ -100,13 +101,13 @@ input wire m_axis_tready;
 output wire [31 : 0] m_axis_tdata;
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 M_AXIS TKEEP" *)
 output wire [3 : 0] m_axis_tkeep;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME M_AXIS, TDATA_NUM_BYTES 4, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 1, HAS_TLAST 1, FREQ_HZ 100000000, PHASE 0.000, CLK_DOMAIN design_processing_system7_1_0_FCLK_CLK0, LAYERED_METADATA undef, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 M_AXIS TLAST" *)
 output wire m_axis_tlast;
-output wire [31 : 0] axis_data_count;
 output wire [31 : 0] axis_wr_data_count;
 output wire [31 : 0] axis_rd_data_count;
 
-  axis_data_fifo_v1_1_axis_data_fifo #(
+  axis_data_fifo_v2_0_3_top #(
     .C_FAMILY("zynq"),
     .C_AXIS_TDATA_WIDTH(32),
     .C_AXIS_TID_WIDTH(1),
@@ -117,10 +118,14 @@ output wire [31 : 0] axis_rd_data_count;
     .C_FIFO_MODE(1),
     .C_IS_ACLK_ASYNC(1),
     .C_SYNCHRONIZER_STAGE(2),
-    .C_ACLKEN_CONV_MODE(0)
+    .C_ACLKEN_CONV_MODE(0),
+    .C_ECC_MODE(0),
+    .C_FIFO_MEMORY_TYPE("auto"),
+    .C_USE_ADV_FEATURES(825503796),
+    .C_PROG_EMPTY_THRESH(5),
+    .C_PROG_FULL_THRESH(11)
   ) inst (
     .s_axis_aresetn(s_axis_aresetn),
-    .m_axis_aresetn(m_axis_aresetn),
     .s_axis_aclk(s_axis_aclk),
     .s_axis_aclken(1'H1),
     .s_axis_tvalid(s_axis_tvalid),
@@ -143,8 +148,15 @@ output wire [31 : 0] axis_rd_data_count;
     .m_axis_tid(),
     .m_axis_tdest(),
     .m_axis_tuser(),
-    .axis_data_count(axis_data_count),
     .axis_wr_data_count(axis_wr_data_count),
-    .axis_rd_data_count(axis_rd_data_count)
+    .axis_rd_data_count(axis_rd_data_count),
+    .almost_empty(),
+    .prog_empty(),
+    .almost_full(),
+    .prog_full(),
+    .sbiterr(),
+    .dbiterr(),
+    .injectsbiterr(1'H0),
+    .injectdbiterr(1'H0)
   );
 endmodule

@@ -1,0 +1,118 @@
+#include "driver/AxiDmaDriver.h"
+
+#include "FreeRTOS.h"
+#include "portmacro.h"
+
+#include "xil_printf.h"
+
+void setupDma(XScuGic *interruptController) {
+	txDmaComplete = xSemaphoreCreateBinary();
+	configASSERT(txDmaComplete);
+
+	xSemaphoreTake(txDmaComplete, 0);
+
+    XAxiDma_Config *axiDmaConfig;
+    axiDmaConfig = XAxiDma_LookupConfig(DMA_DEVICE_ID);
+	configASSERT(axiDmaConfig);
+
+    BaseType_t status;
+	status = XAxiDma_CfgInitialize(&_axiDma, axiDmaConfig);
+	configASSERT(status == XST_SUCCESS);
+	(void)status;
+
+	configASSERT(!XAxiDma_HasSg(&_axiDma));
+
+    status = XScuGic_Connect(interruptController, RX_INTR_ID, (XInterruptHandler)dmaRxIntrHandler, &_axiDma);
+	configASSERT(status == XST_SUCCESS);
+	(void)status;
+    
+//    status = XScuGic_Connect(interruptController, TX_INTR_ID, (XInterruptHandler)dmaTxIntrHandler, &_axiDma);
+//	configASSERT(status == XST_SUCCESS);
+//	(void)status;
+
+    XScuGic_Enable(interruptController, RX_INTR_ID);
+//	XScuGic_Enable(interruptController, TX_INTR_ID);
+
+    XAxiDma_IntrDisable(&_axiDma, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE); // Disable all interrupts before setup
+	XAxiDma_IntrDisable(&_axiDma, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DEVICE_TO_DMA);
+
+	XAxiDma_IntrEnable(&_axiDma, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DMA_TO_DEVICE); // Enable all interrupts
+	XAxiDma_IntrEnable(&_axiDma, XAXIDMA_IRQ_ALL_MASK, XAXIDMA_DEVICE_TO_DMA);
+
+	xSemaphoreGive(txDmaComplete);
+}
+
+void dmaRxIntrHandler(void *callback) {
+    XAxiDma *axiDmaInst = (XAxiDma*)callback;
+
+    u32 irqStatus = XAxiDma_IntrGetIrq(axiDmaInst, XAXIDMA_DEVICE_TO_DMA); // Read pending interrupts
+    XAxiDma_IntrAckIrq(axiDmaInst, irqStatus, XAXIDMA_DEVICE_TO_DMA); // Acknowledge pending interrupts
+
+    if (!(irqStatus & XAXIDMA_IRQ_ALL_MASK)) { // If no interrupt is asserted, we do not do anything
+
+	} else if ((irqStatus & XAXIDMA_IRQ_ERROR_MASK)) { // If error interrupt is asserted, reset the hardware to recover from the error, and return with no further processing
+		xil_printf("error - dma rx\r\n");
+        
+        XAxiDma_Reset(axiDmaInst); // Reset should never fail for transmit channel
+
+		int timeOut = RESET_TIMEOUT_COUNTER;
+		while (timeOut) {
+			if (XAxiDma_ResetIsDone(axiDmaInst)) {
+				break;
+			}
+
+			timeOut -= 1;
+		}
+
+	} else if ((irqStatus & XAXIDMA_IRQ_IOC_MASK)) { // If Completion interrupt is asserted
+		xil_printf("done - dma rx complete\r\n");
+	}
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(txDmaComplete, xHigherPriorityTaskWoken);
+}
+
+void dmaTxIntrHandler(void *callback) {
+    XAxiDma *axiDmaInst = (XAxiDma*)callback;
+
+
+    u32 irqStatus = XAxiDma_IntrGetIrq(axiDmaInst, XAXIDMA_DMA_TO_DEVICE); // Read pending interrupts
+    XAxiDma_IntrAckIrq(axiDmaInst, irqStatus, XAXIDMA_DMA_TO_DEVICE); // Acknowledge pending interrupts
+
+    if (!(irqStatus & XAXIDMA_IRQ_ALL_MASK)) { // If no interrupt is asserted, we do not do anything
+
+	} else if ((irqStatus & XAXIDMA_IRQ_ERROR_MASK)) { // If error interrupt is asserted, reset the hardware to recover from the error, and return with no further processing
+		xil_printf("error - dma tx\r\n");
+        
+        XAxiDma_Reset(axiDmaInst); // Reset should never fail for transmit channel
+
+		int timeOut = RESET_TIMEOUT_COUNTER;
+		while (timeOut) {
+			if (XAxiDma_ResetIsDone(axiDmaInst)) {
+				break;
+			}
+
+			timeOut -= 1;
+		}
+	} else if ((irqStatus & XAXIDMA_IRQ_IOC_MASK)) { // If Completion interrupt is asserted
+		xil_printf("done - dma tx complete\r\n");
+	}
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(txDmaComplete, xHigherPriorityTaskWoken);
+}
+
+BaseType_t dmaStartTransfer(UINTPTR buffAddr, u32 length,	int direction) {
+
+	if((txDmaComplete != NULL) && (xSemaphoreTake(txDmaComplete, (TickType_t)10) == pdTRUE)) {
+		XAxiDma_SimpleTransfer(&_axiDma, buffAddr, length, direction);
+		return XST_SUCCESS;
+	} else {
+		return XST_DMA_ERROR;
+	}
+}
+
+
+u32 checkDmaIdle(u32 baseAddres, u32 offset) {
+    return (XAxiDma_ReadReg(baseAddres, offset) & XAXIDMA_IDLE_MASK);
+}

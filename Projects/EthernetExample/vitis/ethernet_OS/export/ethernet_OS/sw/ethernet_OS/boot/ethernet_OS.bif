@@ -1,0 +1,7 @@
+/*ethernet_OS*/
+the_ROM_image:
+{
+  [bootloader]<ethernet_OS/boot/fsbl.elf>
+   <bitstream> 
+  <elf,ps7_cortexa9_0>
+}

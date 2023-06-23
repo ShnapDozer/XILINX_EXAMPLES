@@ -49,8 +49,7 @@
  #define UART_BAUD 9600
 #endif
 
-void
-enable_caches()
+void enable_caches()
 {
 #ifdef __PPC__
     Xil_ICacheEnableRegion(CACHEABLE_REGION_MASK);
@@ -78,8 +77,7 @@ disable_caches()
 #endif
 }
 
-void
-init_uart()
+void init_uart()
 {
 #ifdef STDOUT_IS_16550
     XUartNs550_SetBaud(STDOUT_BASEADDR, XPAR_XUARTNS550_CLOCK_HZ, UART_BAUD);

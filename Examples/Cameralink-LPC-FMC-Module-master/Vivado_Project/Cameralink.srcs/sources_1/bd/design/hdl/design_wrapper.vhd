@@ -1,8 +1,8 @@
---Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
+--Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2014.4 (lin32) Build 1071353 Tue Nov 18 16:37:30 MST 2014
---Date        : Wed Mar  4 21:35:54 2015
---Host        : roy-virtual-machine running 32-bit Ubuntu 14.04.1 LTS
+--Tool Version: Vivado v.2020.1 (win64) Build 2902540 Wed May 27 19:54:49 MDT 2020
+--Date        : Tue Jun 13 12:00:38 2023
+--Host        : DESKTOP-C24D4M0 running 64-bit major release  (build 9200)
 --Command     : generate_target design_wrapper.bd
 --Design      : design_wrapper
 --Purpose     : IP block netlist
@@ -79,7 +79,7 @@ architecture STRUCTURE of design_wrapper is
   end component design;
 begin
 design_i: component design
-    port map (
+     port map (
       DDR_addr(14 downto 0) => DDR_addr(14 downto 0),
       DDR_ba(2 downto 0) => DDR_ba(2 downto 0),
       DDR_cas_n => DDR_cas_n,

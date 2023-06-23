@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "xaxidma.h": "c",
+        "xparameters.h": "c",
+        "platform.h": "c",
+        "stdio.h": "c",
+        "xil_printf.h": "c",
+        "stdbool.h": "c",
+        "axidmadriver.h": "c",
+        "xscugic.h": "c"
+    }
+}

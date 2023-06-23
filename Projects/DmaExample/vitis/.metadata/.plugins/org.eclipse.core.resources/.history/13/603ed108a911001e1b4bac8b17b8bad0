@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#include "AxiDmaDriver.h"
+#include "Common.h"
+
+#include "xscugic.h"
+#include "xil_printf.h"
+
+#define FIFO_SIZE 128
+
+XScuGic xInterruptController;
+
+int main()
+{
+    xil_printf("\n\r\n\rstart - app\n\r");
+    
+    setupInterruptSystem(&xInterruptController);
+    setupUart(&xInterruptController, 115200, UART_QUEUE_SIZE);
+    setupDma(&xInterruptController);
+
+    sys_thread_new("udpNetworkThread",
+					(void(*)(void*))networkThread,
+					NULL,
+					THREAD_STACKSIZE,
+					DEFAULT_THREAD_PRIO);
+    
+}
+
+void networkThread() {
+	xil_printf("start - networkThread\r\n");
+
+	setupNetwork();
+	setupUdpSocket(5001);
+
+	sys_thread_new("networkSend4DmaThread",
+					(void(*)(void*))networkSend4DmaThread,
+					NULL,
+					THREAD_STACKSIZE,
+					DEFAULT_THREAD_PRIO);
+
+	udpSocketApp(1000);
+}
+
+void networkSend4DmaThread() {
+	xil_printf("start - networkSend4DmaThread\r\n");
+
+	int txPntr[FIFO_SIZE];
+	int rxPntr[FIFO_SIZE];
+
+	int *dmaWriteBuff = dmaRxBuffOne;
+	if(dmaStartTransfer((UINTPTR)dmaRxBuffOne, DMA_BUFF_SIZE, XAXIDMA_DEVICE_TO_DMA) != XST_SUCCESS) {
+		xil_printf("error - start dmaStartTransfer\r\n");
+	}
+
+	for(int i = 0; i < FIFO_SIZE; ++i) {
+		txPntr[i] = 2*i;
+	}
+
+	Xil_DCacheFlushRange((UINTPTR)txPntr, sizeof(int)*FIFO_SIZE);
+	Xil_DCacheFlushRange((UINTPTR)rxPntr, sizeof(int)*FIFO_SIZE);
+
+	xil_printf("start - XAxiDma_SimpleTransfer, XAXIDMA_DMA_TO_DEVICE\n\r");
+	status = XAxiDma_SimpleTransfer(&_axiDma, (UINTPTR)txPntr, sizeof(int)*FIFO_SIZE, XAXIDMA_DMA_TO_DEVICE);
+	if(status != XST_SUCCESS) {
+		xil_printf("error - XAxiDma_SimpleTransfer, XAXIDMA_DMA_TO_DEVICE \r\n");
+		return XST_FAILURE;
+	}
+
+	xil_printf("start - XAxiDma_SimpleTransfer, XAXIDMA_DEVICE_TO_DMA\n\r");
+	status = XAxiDma_SimpleTransfer(&_axiDma, (UINTPTR)rxPntr, sizeof(int)*FIFO_SIZE, XAXIDMA_DEVICE_TO_DMA);
+	if(status != XST_SUCCESS) {
+		xil_printf("error - XAxiDma_SimpleTransfer, XAXIDMA_DEVICE_TO_DMA \r\n");
+		return XST_FAILURE;
+	}
+
+	xil_printf("status - XAxiDma dMA to device: %d | XAxiDma device to dma: %d\n\r", checkDmaIdle(DMA_DEVICE_BASEADD, 0x4), checkDmaIdle(DMA_DEVICE_BASEADD, 0x34));
+
+	while((status = checkDmaIdle(DMA_DEVICE_BASEADD, 0x4)) != 2) {} // DMA to device
+	while((status = checkDmaIdle(DMA_DEVICE_BASEADD, 0x34)) != 2) {} // Device to dma
+
+	xil_printf("status - XAxiDma dMA to device: %d | XAxiDma device to dma: %d\n\r", checkDmaIdle(DMA_DEVICE_BASEADD, 0x4), checkDmaIdle(DMA_DEVICE_BASEADD, 0x34));
+
+	for(int i = 0; i < FIFO_SIZE; ++i) {
+		xil_printf("check - %d | %d\n\r", txPntr[i], rxPntr[i]);
+	}
+
+
+
+
+
+
+	struct sockaddr_in remoteHost;
+	unsigned long remoteAddrTmp = 0;
+	inet_pton(AF_INET, STR(REMOTE_IP_ADDR_1.REMOTE_IP_ADDR_2.REMOTE_IP_ADDR_3.REMOTE_IP_ADDR_4), &remoteAddrTmp);
+
+	memset(&remoteHost, 0, sizeof(struct sockaddr_in));
+	remoteHost.sin_family = AF_INET;
+	remoteHost.sin_port = htons(5001);
+	remoteHost.sin_addr.s_addr = remoteAddrTmp;
+
+	for(;;) {
+		xSemaphoreTake(txDmaComplete, portMAX_DELAY);
+
+		whichBuff = !whichBuff;
+		dmaWriteBuff = whichBuff ? dmaRxBuffOne : dmaRxBuffTwo;
+
+		xSemaphoreGive(txDmaComplete);
+
+		if(dmaStartTransfer((UINTPTR)dmaWriteBuff, DMA_BUFF_SIZE, XAXIDMA_DMA_TO_DEVICE) != XST_SUCCESS) {
+			xil_printf("error - start dmaStartTransfer\r\n");
+		}
+
+		for(int i = 0; i < DMA_BUFF_SIZE / 1024; ++i) {
+			sendto(sock, &dmaWriteBuff[i*1024], 1024, 0, (struct sockaddr*)&remoteHost, sizeof(remoteHost));
+		}
+	}
+
+}
