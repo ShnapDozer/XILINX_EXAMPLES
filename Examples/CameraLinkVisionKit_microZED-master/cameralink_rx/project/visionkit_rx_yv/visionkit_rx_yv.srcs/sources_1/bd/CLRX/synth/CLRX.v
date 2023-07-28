@@ -1,7 +1,7 @@
 //Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2020.1 (win64) Build 2902540 Wed May 27 19:54:49 MDT 2020
-//Date        : Tue Jun 13 10:46:52 2023
+//Date        : Fri Jul  7 17:05:18 2023
 //Host        : DESKTOP-C24D4M0 running 64-bit major release  (build 9200)
 //Command     : generate_target CLRX.bd
 //Design      : CLRX

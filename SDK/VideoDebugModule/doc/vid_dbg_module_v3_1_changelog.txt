@@ -1,0 +1,27 @@
+2015.3:
+ * Version 3.1
+ * Re-package IP with GUI cleanup
+ * Upgrade of JTAG to AXI sub core
+ * AXI Lite interface only enabled when selected
+ * Included software, tcl driver, and doc with IP package
+
+2014.3:
+ * Version 3.0
+ * Added AXI4-Lite register interface
+ * Added C API for use with AXI4-Lite interface
+ * Enhanced the capability of TCL API
+ * Added additional run-time control/status capabilities
+ * Added Frame Size History FIFO flags to top level port
+ * Removed tkeep
+ * Removed sim-only option
+ * Added user_guide.pdf
+ * GUI changes
+
+2014.2:
+ * Version 2.0
+ * Removed m_axis_interface
+ * Added the ability to reset via TCL
+
+2014.1:
+ * Version 1.0
+ * Initial Release

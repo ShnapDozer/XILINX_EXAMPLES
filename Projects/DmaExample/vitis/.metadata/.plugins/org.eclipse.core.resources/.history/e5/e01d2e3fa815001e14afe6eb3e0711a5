@@ -1,0 +1,118 @@
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "portmacro.h"
+
+#include "xil_cache.h"
+#include "xil_printf.h"
+#include "xil_types.h"
+#include "xil_io.h"
+
+#include "xdmaps.h"
+#include "xparameters.h"
+
+#include "AxiDmaDriver.h"
+#include "NetworkDriver.h"
+
+#include "Common.h"
+
+#define FIFO_SIZE 128
+
+XScuGic xInterruptController;
+
+xTaskHandle udpNetworkThreadHandle = NULL;
+xTaskHandle networkSend4DmaThreadHandle = NULL;
+
+void networkThread();
+void networkSend4DmaThread();
+
+int main()
+{
+    xil_printf("\n\r\n\rstart - app\n\r");
+    
+    setupInterruptSystem(&xInterruptController);
+    setupDma(&xInterruptController);
+
+    udpNetworkThreadHandle = sys_thread_new("udpNetworkThread",
+								(void(*)(void*))networkThread,
+								NULL,
+								THREAD_STACKSIZE,
+								DEFAULT_THREAD_PRIO);
+    
+    vTaskStartScheduler();
+
+	for(;;){ }
+	return 0;
+
+}
+
+void networkThread() {
+	xil_printf("start - networkThread\r\n");
+
+	setupNetwork();
+	setupUdpSocket(5001);
+
+	networkSend4DmaThreadHandle = sys_thread_new("networkSend4DmaThread",
+									(void(*)(void*))networkSend4DmaThread,
+									NULL,
+									THREAD_STACKSIZE,
+									DEFAULT_THREAD_PRIO);
+
+	udpSocketApp(1000);
+}
+
+void networkSend4DmaThread() {
+	xil_printf("start - networkSend4DmaThread\r\n");
+
+	int *txPntr = pvPortMalloc(sizeof(int)*FIFO_SIZE);
+	int *rxPntr = pvPortMalloc(sizeof(int)*FIFO_SIZE);;
+
+	for(int i = 0; i < FIFO_SIZE; ++i) {
+		txPntr[i] = 2*i;
+	}
+
+	Xil_DCacheFlushRange((UINTPTR)txPntr, sizeof(int)*FIFO_SIZE);
+	Xil_DCacheFlushRange((UINTPTR)rxPntr, sizeof(int)*FIFO_SIZE);
+
+	xil_printf("start - XAxiDma_SimpleTransfer, XAXIDMA_DMA_TO_DEVICE\n\r");
+
+	if(dmaStartTransfer((UINTPTR)txPntr, sizeof(int)*FIFO_SIZE, XAXIDMA_DMA_TO_DEVICE) != XST_SUCCESS) {
+		xil_printf("error - start dmaStartTransfer\r\n");
+	}
+
+	xSemaphoreTake(txDmaComplete, portMAX_DELAY);
+
+	xil_printf("start - XAxiDma_SimpleTransfer, XAXIDMA_DEVICE_TO_DMA\n\r");
+
+	xSemaphoreGive(txDmaComplete);
+
+
+	if(dmaStartTransfer((UINTPTR)rxPntr, sizeof(int)*FIFO_SIZE, XAXIDMA_DEVICE_TO_DMA) != XST_SUCCESS) {
+		xil_printf("error - start dmaStartTransfer\r\n");
+	}
+
+	struct sockaddr_in remoteHost;
+	unsigned long remoteAddrTmp = 0;
+	inet_pton(AF_INET, STR(REMOTE_IP_ADDR_1.REMOTE_IP_ADDR_2.REMOTE_IP_ADDR_3.REMOTE_IP_ADDR_4), &remoteAddrTmp);
+
+	memset(&remoteHost, 0, sizeof(struct sockaddr_in));
+	remoteHost.sin_family = AF_INET;
+	remoteHost.sin_port = htons(5001);
+	remoteHost.sin_addr.s_addr = remoteAddrTmp;
+
+	xSemaphoreTake(txDmaComplete, portMAX_DELAY);
+
+	xil_printf("status - XAxiDma dMA to device: %d | XAxiDma device to dma: %d\n\r", checkDmaIdle(DMA_DEVICE_BASEADD, 0x4), checkDmaIdle(DMA_DEVICE_BASEADD, 0x34));
+
+	sendto(sock, rxPntr, sizeof(int)*FIFO_SIZE, 0, (struct sockaddr*)&remoteHost, sizeof(remoteHost));
+
+	xSemaphoreGive(txDmaComplete);
+
+	vTaskDelete();
+
+}

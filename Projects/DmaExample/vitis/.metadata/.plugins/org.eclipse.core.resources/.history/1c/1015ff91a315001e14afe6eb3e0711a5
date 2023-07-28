@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="test_app" location="C:/Users/Work/Desktop/XILINX_EXAMPLES/Projects/DmaExample/vitis/test_app" platform="C:/Users/Work/Desktop/XILINX_EXAMPLES/Projects/DmaExample/vitis/DmaDesign_wrapper/export/DmaDesign_wrapper/DmaDesign_wrapper.xpfm" platformUID="xilinx:zc702::0.0(custom)" systemProject="test_app_system" sysConfig="DmaDesign_wrapper" runtime="C/C++" cpu="domain_ps7_cortexa9_0" cpuInstance="ps7_cortexa9_0" os="freertos10_xilinx" mssSignature="6325020f5b007d1c83087a3cc88bfe09">
+  <configuration name="Debug" id="xilinx.gnu.armv7.exe.debug.132482445" dirty="true">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+    <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <configuration name="Release" id="xilinx.gnu.armv7.exe.release.975045956" dirty="true">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <template appTemplateName="freertos_lwip_udp_perf_server" hasBspSettings="true"/>
+</sdkproject:SdkProject>

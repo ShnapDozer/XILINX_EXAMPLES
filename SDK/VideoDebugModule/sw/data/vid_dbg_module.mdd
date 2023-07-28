@@ -1,0 +1,12 @@
+
+OPTION psf_version = 2.1;
+
+BEGIN driver vid_dbg_module
+
+  OPTION supported_peripherals = (vid_dbg_module_v[3-9]_[0-9][0-9]_[a-z] vid_dbg_module_v[3-9]_[0-9]);
+  OPTION driver_state = ACTIVE;
+  OPTION copyfiles = all;
+  OPTION VERSION = 3.1;
+  OPTION NAME = vid_dbg_module;
+
+END driver

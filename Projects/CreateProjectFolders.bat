@@ -11,6 +11,7 @@ mkdir .\ProjectFolder\src\simulation
 mkdir .\ProjectFolder\src\blockDesign
 mkdir .\ProjectFolder\src\constraints
 mkdir .\ProjectFolder\src\hardwareFiles
+mkdir .\ProjectFolder\src\ipCores
 
 xcopy .\_ForScript\RestoreProject.bat .\ProjectFolder\
 xcopy .\_ForScript\.gitignore .\ProjectFolder\
